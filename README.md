@@ -9,6 +9,9 @@ more detailed Detection3D messages (see also [this discussion](https://github.co
 - Detection3DWithPcl.msg
 - Detection3DWithPclArray.msg
 
+![Detection3D_with_pcl](./vision_msgs_rviz_plugins/assets/RVIZ_detection3D_plus_pcl.png)
+
+
 
 ## Introduction
 

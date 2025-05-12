@@ -131,6 +131,13 @@ class pub_detection3_d_array(Node):
         #    spread_z=bbox.size.z / 2.0,
         #)
 
+        # Generate a random color
+        random_color = (
+            random.randint(0, 255),  # Red
+            random.randint(0, 255),  # Green
+            random.randint(0, 255)   # Blue
+        )
+
         msg.source_cloud = self.create_colored_pointcloud(
             bbox.center.position.x,
             bbox.center.position.y,
@@ -139,7 +146,7 @@ class pub_detection3_d_array(Node):
             spread_x=bbox.size.x / 2.0,
             spread_y=bbox.size.y / 2.0,
             spread_z=bbox.size.z / 2.0,
-            color=(255, 0, 0)  # Red color
+            color=random_color 
         )
 
         return msg
@@ -154,8 +161,9 @@ class pub_detection3_d_array(Node):
         for i in range(len(self.__msg_def["score"])):
             for j in range(len(self.__msg_def["score"])):
                 bbox = BoundingBox3D()
-                quat = quaternion_about_axis(
-                    (self.__counter % 100) * pi * 2 / 100.0, [0, 0, 1])
+                #quat = quaternion_about_axis( (self.__counter % 100) * pi * 2 / 100.0, [0, 0, 1])
+                quat = quaternion_about_axis( 0 * pi * 2 / 100.0, [0, 0, 1])
+                
                 bbox.center.orientation.x = quat[0]
                 bbox.center.orientation.y = quat[1]
                 bbox.center.orientation.z = quat[2]

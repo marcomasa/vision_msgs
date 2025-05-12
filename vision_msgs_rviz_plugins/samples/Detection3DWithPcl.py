@@ -159,8 +159,9 @@ class pub_detection3_d_array(Node):
 
         # Create a single Detection3D message
         bbox = BoundingBox3D()
-        quat = quaternion_about_axis(
-            (self.__counter % 100) * pi * 2 / 100.0, [0, 0, 1])
+        #quat = quaternion_about_axis((self.__counter % 100) * pi * 2 / 100.0, [0, 0, 1])
+        quat = quaternion_about_axis( 0 * pi * 2 / 100.0, [0, 0, 1])
+
         bbox.center.orientation.x = quat[0]
         bbox.center.orientation.y = quat[1]
         bbox.center.orientation.z = quat[2]
