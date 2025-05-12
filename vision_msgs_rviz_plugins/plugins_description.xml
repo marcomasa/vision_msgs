@@ -42,5 +42,27 @@
       </description>
       <message_type>vision_msgs::msg::BoundingBox3DArray</message_type>
     </class>
+
+    <class
+      name="vision_msgs_rviz_plugins/Detection3DWithPcl"
+      type="rviz_plugins::Detection3DWithPclDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Display Detection 3D via markers or edges and pcl
+      </description>
+      <message_type>vision_msgs::msg::Detection3DWithPcl</message_type>
+    </class>
+
+    <class
+      name="vision_msgs_rviz_plugins/Detection3DWithPclArray"
+      type="rviz_plugins::Detection3DWithPclArrayDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Display Detection 3D Array via markers or edges and pcl
+      </description>
+      <message_type>vision_msgs::msg::Detection3DWithPclArray</message_type>
+    </class>
   
   </library>

@@ -1,4 +1,14 @@
-# ROS Vision Messages
+# ROS Vision Messages - Custom Fork
+
+## Main Changes
+
+This package is a fork from the original [vision_msgs](https://github.com/ros-perception/vision_msgs) package.
+The main thing that was added are custom messag and display types for 
+more detailed Detection3D messages (see also [this discussion](https://github.com/ros-perception/vision_msgs/issues/105)):
+
+- Detection3DWithPcl.msg
+- Detection3DWithPclArray.msg
+
 
 ## Introduction
 

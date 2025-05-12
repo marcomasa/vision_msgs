@@ -15,6 +15,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+add_compile_options(-O2)
+
+
 # find dependencies
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 find_package(yaml_cpp_vendor REQUIRED)
@@ -31,6 +34,7 @@ find_package(rviz_common REQUIRED)
 find_package(rviz_default_plugins REQUIRED)
 find_package(rviz_rendering REQUIRED)
 find_package(vision_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 
 ## This setting causes Qt's "MOC" generation to happen automatically, which is required for
@@ -43,6 +47,9 @@ set(vision_msgs_rviz_plugins_headers_to_moc
   include/vision_msgs_rviz_plugins/detection_3d.hpp
   include/vision_msgs_rviz_plugins/bounding_box_3d.hpp
   include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp
+
+  include/vision_msgs_rviz_plugins/detection_3d_with_pcl.hpp
+  include/vision_msgs_rviz_plugins/detection_3d_with_pcl_array.hpp
 )
 
 foreach(header "${vision_msgs_rviz_plugins_headers_to_moc}")
@@ -57,6 +64,10 @@ set(vision_msgs_rviz_plugins_source_files
   src/detection_3d.cpp
   src/bounding_box_3d.cpp
   src/bounding_box_3d_array.cpp
+
+  ## new custom visualization classes
+  src/detection_3d_with_pcl.cpp
+  src/detection_3d_with_pcl_array.cpp
 )
 
 
@@ -91,6 +102,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rviz_rendering
   rviz_default_plugins
   yaml_cpp_vendor
+  sensor_msgs
 )
 
 # Export the plugin to be imported by rviz2
@@ -108,6 +120,7 @@ ament_export_dependencies(
   vision_msgs
   rviz_common
   rviz_rendering
+  sensor_msgs
 )
 
 install(
@@ -138,6 +151,8 @@ install(PROGRAMS
   samples/Detection3D.py
   samples/BoundingBox3D.py
   samples/BoundingBox3DArray.py
+  samples/Detection3DWithPcl.py
+  samples/Detection3DWithPclArray.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
