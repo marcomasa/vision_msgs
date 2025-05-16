@@ -29,6 +29,8 @@ Detection3DWithPclArrayDisplay::Detection3DWithPclArrayDisplay()
         new rviz_common::properties::StringProperty("ConfigPath", "", "Path to yaml config for rgb color mappings", this, SLOT(updateColorConfigs()));
     show_pointcloud_property_ =
         new rviz_common::properties::BoolProperty("Show PointCloud", false, "Show the source cloud", this, SLOT(updatePointCloud()));
+    show_bounding_box_property_ =
+        new rviz_common::properties::BoolProperty("Show Bounding Box", true, "Show the bounding box", this, SLOT(updateBoundingBox()));
 }
 
 Detection3DWithPclArrayDisplay::~Detection3DWithPclArrayDisplay()
@@ -37,6 +39,8 @@ Detection3DWithPclArrayDisplay::~Detection3DWithPclArrayDisplay()
     delete line_width_property_;
     delete alpha_property_;
     delete show_score_property_;
+    delete show_pointcloud_property_;
+    delete show_bounding_box_property_;
 }
 
 void Detection3DWithPclArrayDisplay::onInitialize()
@@ -62,6 +66,8 @@ void Detection3DWithPclArrayDisplay::onInitialize()
 
     m_point_cloud_common->initialize(context_, scene_node_);
     show_pointcloud_ = show_pointcloud_property_->getBool();
+
+    show_bounding_box_ = show_bounding_box_property_->getBool();
 }
 
 void Detection3DWithPclArrayDisplay::load(const rviz_common::Config& config)
@@ -74,7 +80,11 @@ void Detection3DWithPclArrayDisplay::load(const rviz_common::Config& config)
 void Detection3DWithPclArrayDisplay::processMessage(vision_msgs::msg::Detection3DWithPclArray::ConstSharedPtr msg)
 {
     latest_msg = msg;
-    if (!only_edge_)
+    if(!show_bounding_box_)
+    {
+        m_marker_common->clearMarkers();
+    }
+    else if (!only_edge_)
     {
         showBoxes(msg, show_score_);
     }
@@ -164,6 +174,16 @@ void Detection3DWithPclArrayDisplay::updatePointCloud()
     {
         processMessage(latest_msg);
     }
+}
+
+void Detection3DWithPclArrayDisplay::updateBoundingBox()
+{
+    show_bounding_box_ = show_bounding_box_property_->getBool();
+    if (latest_msg)
+    {
+        processMessage(latest_msg);
+    }
+
 }
 
 }    // namespace rviz_plugins

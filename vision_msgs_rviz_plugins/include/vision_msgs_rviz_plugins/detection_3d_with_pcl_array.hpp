@@ -66,9 +66,10 @@ private:
   Detection3DWithPclArray::ConstSharedPtr latest_msg;
 
 protected:
-  bool only_edge_, show_score_, show_pointcloud_;
+  bool only_edge_, show_score_, show_pointcloud_, show_bounding_box_;
 
   rviz_common::properties::BoolProperty * show_pointcloud_property_;
+  rviz_common::properties::BoolProperty * show_bounding_box_property_;
   
   rviz_common::properties::BoolProperty * only_edge_property_;
   rviz_common::properties::FloatProperty * line_width_property_;
@@ -83,5 +84,6 @@ protected Q_SLOTS:
   void updateShowScores();
   void updateColorConfigs();
   void updatePointCloud();
+  void updateBoundingBox();
 };
 }  // namespace rviz_plugins
