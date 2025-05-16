@@ -11,6 +11,12 @@ more detailed Detection3D messages (see also [this discussion](https://github.co
 
 ![Detection3D_with_pcl](./vision_msgs_rviz_plugins/assets/RVIZ_detection3D_plus_pcl.png)
 
+## How to make your package use this alternative version
+
+1. Clone this package into your ros2_ws
+2. Source this workspace overlay
+3. (Optional) If you built your package before with the regular *vision_msgs* package, you will need to delete the build and install directories for your package!
+4. Build your package
 
 
 ## Introduction
