@@ -207,6 +207,12 @@ protected:
                 RVIZ_COMMON_LOG_ERROR("PointCloud2 frame id mismatch in Detection3DWithPclArray message.");
                 return;
             }
+
+            if (merged_cloud->point_step == 0)
+            {
+                RVIZ_COMMON_LOG_WARNING("PointCloud2 point step is zero.");
+                return;
+            }
             
             merged_cloud->height = 1;
             merged_cloud->is_dense = false;
