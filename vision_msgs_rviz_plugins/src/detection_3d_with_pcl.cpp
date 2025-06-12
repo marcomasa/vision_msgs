@@ -25,11 +25,13 @@ Detection3DWithPclDisplay::Detection3DWithPclDisplay()
     alpha_property_      = new rviz_common::properties::FloatProperty("Alpha", 1.0, "Transparency", this, SLOT(updateAlpha()));
     show_score_property_ =
         new rviz_common::properties::BoolProperty("Show Score", false, "Display score next to bounding boxes", this, SLOT(updateShowScores()));
+    show_class_property_ =
+        new rviz_common::properties::BoolProperty("Show Class", false, "Display class next to bounding boxes", this, SLOT(updateShowClasses()));
     string_property_ =
         new rviz_common::properties::StringProperty("ConfigPath", "", "Path to yaml config for rgb color mappings", this, SLOT(updateColorConfigs()));
     show_pointcloud_property_ =
         new rviz_common::properties::BoolProperty("Show PointCloud", false, "Show the source cloud", this, SLOT(updatePointCloud()));
-    show_bounding_box_property_ = 
+    show_bounding_box_property_ =
         new rviz_common::properties::BoolProperty("Show Bounding Box", true, "Show the bounding box", this, SLOT(updateBoundingBox()));
 }
 
@@ -39,6 +41,7 @@ Detection3DWithPclDisplay::~Detection3DWithPclDisplay()
     delete line_width_property_;
     delete alpha_property_;
     delete show_score_property_;
+    delete show_class_property_;
     delete show_pointcloud_property_;
     delete show_bounding_box_property_;
 }
@@ -63,6 +66,7 @@ void Detection3DWithPclDisplay::onInitialize()
 
     only_edge_  = only_edge_property_->getBool();
     show_score_ = show_score_property_->getBool();
+    show_class_ = show_class_property_->getBool();
 
     m_point_cloud_common->initialize(context_, scene_node_);
     show_pointcloud_ = show_pointcloud_property_->getBool();
@@ -78,17 +82,17 @@ void Detection3DWithPclDisplay::load(const rviz_common::Config& config)
 void Detection3DWithPclDisplay::processMessage(vision_msgs::msg::Detection3DWithPcl::ConstSharedPtr msg)
 {
     latest_msg = msg;
-    if(!show_bounding_box_)
+    if (!show_bounding_box_)
     {
         m_marker_common->clearMarkers();
     }
     else if (!only_edge_)
     {
-        showBoxes(msg, show_score_);
+        showBoxes(msg, show_score_, show_class_);
     }
     else
     {
-        showEdges(msg, show_score_);
+        showEdges(msg, show_score_, show_class_);
     }
 
     showPointCloud(msg, !show_pointcloud_);
@@ -125,11 +129,11 @@ void Detection3DWithPclDisplay::updateEdge()
     {
         if (only_edge_)
         {
-            showEdges(latest_msg, show_score_);
+            showEdges(latest_msg, show_score_, show_class_);
         }
         else
         {
-            showBoxes(latest_msg, show_score_);
+            showBoxes(latest_msg, show_score_, show_class_);
         }
     }
 }
@@ -161,6 +165,15 @@ void Detection3DWithPclDisplay::updateShowScores()
     }
 }
 
+void Detection3DWithPclDisplay::updateShowClasses()
+{
+    show_class_ = show_class_property_->getBool();
+    if (latest_msg)
+    {
+        processMessage(latest_msg);
+    }
+}
+
 void Detection3DWithPclDisplay::updateColorConfigs()
 {
     this->updateColorConfig();
@@ -173,8 +186,7 @@ void Detection3DWithPclDisplay::updatePointCloud()
     {
         processMessage(latest_msg);
     }
-
-}  
+}
 
 void Detection3DWithPclDisplay::updateBoundingBox()
 {
@@ -184,9 +196,9 @@ void Detection3DWithPclDisplay::updateBoundingBox()
         processMessage(latest_msg);
     }
 
-}// namespace rviz_plugins
+}    // namespace rviz_plugins
 
-}
+}    // namespace rviz_plugins
 // Export the plugin
 #include <pluginlib/class_list_macros.hpp>    // NOLINT
 PLUGINLIB_EXPORT_CLASS(rviz_plugins::Detection3DWithPclDisplay, rviz_common::Display)

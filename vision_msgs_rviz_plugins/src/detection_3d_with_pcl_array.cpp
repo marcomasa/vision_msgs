@@ -25,6 +25,8 @@ Detection3DWithPclArrayDisplay::Detection3DWithPclArrayDisplay()
     alpha_property_      = new rviz_common::properties::FloatProperty("Alpha", 1.0, "Transparency", this, SLOT(updateAlpha()));
     show_score_property_ =
         new rviz_common::properties::BoolProperty("Show Score", false, "Display score next to bounding boxes", this, SLOT(updateShowScores()));
+    show_class_property_ =
+        new rviz_common::properties::BoolProperty("Show Class", false, "Display class next to bounding boxes", this, SLOT(updateShowClasses()));
     string_property_ =
         new rviz_common::properties::StringProperty("ConfigPath", "", "Path to yaml config for rgb color mappings", this, SLOT(updateColorConfigs()));
     show_pointcloud_property_ =
@@ -39,6 +41,7 @@ Detection3DWithPclArrayDisplay::~Detection3DWithPclArrayDisplay()
     delete line_width_property_;
     delete alpha_property_;
     delete show_score_property_;
+    delete show_class_property_;
     delete show_pointcloud_property_;
     delete show_bounding_box_property_;
 }
@@ -63,6 +66,7 @@ void Detection3DWithPclArrayDisplay::onInitialize()
 
     only_edge_  = only_edge_property_->getBool();
     show_score_ = show_score_property_->getBool();
+    show_class_ = show_class_property_->getBool();
 
     m_point_cloud_common->initialize(context_, scene_node_);
     show_pointcloud_ = show_pointcloud_property_->getBool();
@@ -86,11 +90,11 @@ void Detection3DWithPclArrayDisplay::processMessage(vision_msgs::msg::Detection3
     }
     else if (!only_edge_)
     {
-        showBoxes(msg, show_score_);
+        showBoxes(msg, show_score_, show_class_);
     }
     else
     {
-        showEdges(msg, show_score_);
+        showEdges(msg, show_score_, show_class_);
     }
 
     showPointCloud(msg, !show_pointcloud_);
@@ -126,11 +130,11 @@ void Detection3DWithPclArrayDisplay::updateEdge()
     {
         if (only_edge_)
         {
-            showEdges(latest_msg, show_score_);
+            showEdges(latest_msg, show_score_, show_class_);
         }
         else
         {
-            showBoxes(latest_msg, show_score_);
+            showBoxes(latest_msg, show_score_, show_class_);
         }
     }
 }
@@ -156,6 +160,15 @@ void Detection3DWithPclArrayDisplay::updateAlpha()
 void Detection3DWithPclArrayDisplay::updateShowScores()
 {
     show_score_ = show_score_property_->getBool();
+    if (latest_msg)
+    {
+        processMessage(latest_msg);
+    }
+}
+
+void Detection3DWithPclArrayDisplay::updateShowClasses()
+{
+    show_class_ = show_class_property_->getBool();
     if (latest_msg)
     {
         processMessage(latest_msg);

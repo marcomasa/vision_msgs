@@ -66,7 +66,7 @@ private:
   Detection3DWithPcl::ConstSharedPtr latest_msg;
 
 protected:
-  bool only_edge_, show_score_, show_pointcloud_, show_bounding_box_;
+  bool only_edge_, show_score_, show_class_, show_pointcloud_, show_bounding_box_;
 
   rviz_common::properties::BoolProperty * show_pointcloud_property_;
   rviz_common::properties::BoolProperty * show_bounding_box_property_;
@@ -75,6 +75,7 @@ protected:
   rviz_common::properties::FloatProperty * line_width_property_;
   rviz_common::properties::FloatProperty * alpha_property_;
   rviz_common::properties::BoolProperty * show_score_property_;
+  rviz_common::properties::BoolProperty * show_class_property_;
 
 
 protected Q_SLOTS:
@@ -82,6 +83,7 @@ protected Q_SLOTS:
   void updateLineWidth();
   void updateAlpha();
   void updateShowScores();
+  void updateShowClasses();
   void updateColorConfigs();
   void updatePointCloud();
   void updateBoundingBox();

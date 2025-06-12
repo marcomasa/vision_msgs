@@ -72,6 +72,7 @@ protected:
     std::string                                                         color_config_path_;
     rviz_common::properties::StringProperty*                            string_property_;
     std::unordered_map<int, visualization_msgs::msg::Marker::SharedPtr> score_markers;
+    std::unordered_map<int, visualization_msgs::msg::Marker::SharedPtr> class_markers;
 
     std::map<std::string, QColor> idToColorMap = {{"car", QColor(255, 165, 0)},
                                                   {"person", QColor(0, 0, 255)},
@@ -176,33 +177,33 @@ protected:
         }
         else
         {
-            auto merged_cloud = std::make_shared<sensor_msgs::msg::PointCloud2>();
-            bool got_header = false;
+            auto merged_cloud    = std::make_shared<sensor_msgs::msg::PointCloud2>();
+            bool got_header      = false;
             bool header_mismatch = false;
-            
+
 
             for (auto& det_and_pcls : msg->detections_and_pcls)
             {
-                if(got_header)
+                if (got_header)
                 {
-                    if(merged_cloud->header.frame_id != det_and_pcls.source_cloud.header.frame_id)
+                    if (merged_cloud->header.frame_id != det_and_pcls.source_cloud.header.frame_id)
                     {
                         header_mismatch = true;
                         continue;
                     }
                 }
 
-                merged_cloud->header = det_and_pcls.source_cloud.header;
-                merged_cloud->point_step = det_and_pcls.source_cloud.point_step;
-                merged_cloud->row_step = det_and_pcls.source_cloud.row_step;
-                merged_cloud->fields = det_and_pcls.source_cloud.fields;
+                merged_cloud->header       = det_and_pcls.source_cloud.header;
+                merged_cloud->point_step   = det_and_pcls.source_cloud.point_step;
+                merged_cloud->row_step     = det_and_pcls.source_cloud.row_step;
+                merged_cloud->fields       = det_and_pcls.source_cloud.fields;
                 merged_cloud->is_bigendian = det_and_pcls.source_cloud.is_bigendian;
-                got_header = true;
+                got_header                 = true;
 
                 merged_cloud->data.insert(merged_cloud->data.end(), det_and_pcls.source_cloud.data.begin(), det_and_pcls.source_cloud.data.end());
             }
 
-            if(header_mismatch)
+            if (header_mismatch)
             {
                 RVIZ_COMMON_LOG_ERROR("PointCloud2 frame id mismatch in Detection3DWithPclArray message.");
                 return;
@@ -213,11 +214,11 @@ protected:
                 RVIZ_COMMON_LOG_WARNING("PointCloud2 point step is zero.");
                 return;
             }
-            
-            merged_cloud->height = 1;
+
+            merged_cloud->height   = 1;
             merged_cloud->is_dense = false;
-            merged_cloud->width = merged_cloud->data.size() / merged_cloud->point_step;
-            
+            merged_cloud->width    = merged_cloud->data.size() / merged_cloud->point_step;
+
             m_point_cloud_common->addMessage(merged_cloud);
         }
     }
@@ -246,11 +247,12 @@ protected:
     }
 
 
-    void showBoxes(const vision_msgs::msg::Detection3DWithPclArray::ConstSharedPtr& msg, const bool show_score)
+    void showBoxes(const vision_msgs::msg::Detection3DWithPclArray::ConstSharedPtr& msg, const bool show_score, const bool show_class)
     {
         edges_.clear();
         m_marker_common->clearMarkers();
         ClearScores(show_score);
+        ClearClasses(show_class);
 
         for (size_t idx = 0U; idx < msg->detections_and_pcls.size(); idx++)
         {
@@ -266,6 +268,10 @@ protected:
                 if (show_score)
                 {
                     ShowScore(msg->detections_and_pcls[idx], result_with_highest_score.hypothesis.score, idx);
+                }
+                if (show_class)
+                {
+                    ShowClass(msg->detections_and_pcls[idx], result_with_highest_score.hypothesis.class_id, idx);
                 }
             }
             else
@@ -283,11 +289,12 @@ protected:
         }
     }
 
-    void showBoxes(const vision_msgs::msg::Detection3DWithPcl::ConstSharedPtr& msg, const bool show_score)
+    void showBoxes(const vision_msgs::msg::Detection3DWithPcl::ConstSharedPtr& msg, const bool show_score, const bool show_class)
     {
         edges_.clear();
         m_marker_common->clearMarkers();
         ClearScores(show_score);
+        ClearClasses(show_class);
 
         const auto marker_ptr = get_marker(msg->bbox);
         QColor     color;
@@ -301,6 +308,10 @@ protected:
             if (show_score)
             {
                 ShowScore(*msg, result_with_highest_score.hypothesis.score, 0);
+            }
+            if (show_class)
+            {
+                ShowClass(*msg, result_with_highest_score.hypothesis.class_id, 0);
             }
         }
         else
@@ -333,7 +344,7 @@ protected:
         }
     }
 
-    void showEdges(const vision_msgs::msg::Detection3DWithPclArray::ConstSharedPtr& msg, const bool show_score)
+    void showEdges(const vision_msgs::msg::Detection3DWithPclArray::ConstSharedPtr& msg, const bool show_score, const bool show_class)
     {
         m_marker_common->clearMarkers();
         ClearScores(show_score);
@@ -353,6 +364,10 @@ protected:
                 if (show_score)
                 {
                     ShowScore(msg->detections_and_pcls[idx], iter->hypothesis.score, idx);
+                }
+                if (show_class)
+                {
+                    ShowClass(msg->detections_and_pcls[idx], iter->hypothesis.class_id, idx);
                 }
             }
             geometry_msgs::msg::Vector3 dimensions = box.size;
@@ -443,7 +458,7 @@ protected:
         }
     }
 
-    void showEdges(const vision_msgs::msg::Detection3DWithPcl::ConstSharedPtr& msg, const bool show_score)
+    void showEdges(const vision_msgs::msg::Detection3DWithPcl::ConstSharedPtr& msg, const bool show_score, const bool show_class)
     {
         m_marker_common->clearMarkers();
         ClearScores(show_score);
@@ -460,6 +475,10 @@ protected:
             if (show_score)
             {
                 ShowScore(*msg, iter->hypothesis.score, 0);
+            }
+            if (show_class)
+            {
+                ShowClass(*msg, iter->hypothesis.class_id, 0);
             }
         }
         else
@@ -591,6 +610,43 @@ protected:
                 m_marker_common->addMessage(marker);
             }
             score_markers.clear();
+        }
+    }
+
+    void ShowClass(const vision_msgs::msg::Detection3DWithPcl detection, const std::string& class_prediction, const size_t idx)
+    {
+        auto marker    = std::make_shared<Marker>();
+        marker->type   = Marker::TEXT_VIEW_FACING;
+        marker->action = Marker::ADD;
+        marker->header = detection.header;
+
+        marker->text            = class_prediction;
+        marker->scale.z         = 0.5;    // Set the size of the text
+        marker->id              = idx;
+        marker->ns              = "class_pred";
+        marker->color.r         = 1.0f;
+        marker->color.g         = 1.0f;
+        marker->color.b         = 1.0f;
+        marker->color.a         = alpha;
+        marker->pose.position.x = static_cast<double>(detection.bbox.center.position.x);
+        marker->pose.position.y = static_cast<double>(detection.bbox.center.position.y);
+        marker->pose.position.z = static_cast<double>(detection.bbox.center.position.z + (detection.bbox.size.z / 2.0) * 1.2 + 0.6);
+
+        // Add the marker to the MarkerArray message
+        m_marker_common->addMessage(marker);
+        class_markers[idx] = marker;
+    }
+
+    void ClearClasses(const bool show_class)
+    {
+        if (!show_class)
+        {
+            for (auto& [id, marker] : class_markers)
+            {
+                marker->action = visualization_msgs::msg::Marker::DELETE;
+                m_marker_common->addMessage(marker);
+            }
+            class_markers.clear();
         }
     }
 
