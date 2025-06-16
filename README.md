@@ -14,9 +14,10 @@ more detailed Detection3D messages (see also [this discussion](https://github.co
 ## How to make your package use this alternative version
 
 1. Clone this package into your ros2_ws
-2. Source this workspace overlay
-3. (Optional) If you built your package before with the regular *vision_msgs* package, you will need to delete the build and install directories for your package!
-4. Build your package
+2. Build the packages *vision_msgs* and *vision_msgs_rviz_plugins*
+3. Source this workspace overlay using *source install/local_setup.bash*
+4. (Optional) If you built your package before with the regular *vision_msgs* package, you will need to delete the build and install directories for your package!
+5. Build your packages using the new messages
 
 
 ## Introduction
