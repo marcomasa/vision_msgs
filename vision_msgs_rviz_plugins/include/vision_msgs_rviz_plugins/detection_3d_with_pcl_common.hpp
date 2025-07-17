@@ -77,7 +77,8 @@ protected:
     std::map<std::string, QColor> idToColorMap = {{"car", QColor(255, 165, 0)},
                                                   {"person", QColor(0, 0, 255)},
                                                   {"cyclist", QColor(255, 255, 0)},
-                                                  {"motorcycle", QColor(230, 230, 250)}};
+                                                  {"motorcycle", QColor(230, 230, 250)},
+                                                  {"class_score_id", QColor(255, 255, 255)}};
 
     visualization_msgs::msg::Marker::SharedPtr get_marker(const vision_msgs::msg::BoundingBox3D& box)
     {
@@ -587,9 +588,11 @@ protected:
         marker->scale.z         = 0.5;    // Set the size of the text
         marker->id              = idx;
         marker->ns              = "score";
-        marker->color.r         = 1.0f;
-        marker->color.g         = 1.0f;
-        marker->color.b         = 1.0f;
+
+        QColor color = getColor("class_score_id");
+        marker->color.r         = color.red() / 255.0f;
+        marker->color.g         = color.green() / 255.0f;
+        marker->color.b         = color.blue() / 255.0f;
         marker->color.a         = alpha;
         marker->pose.position.x = static_cast<double>(detection.bbox.center.position.x);
         marker->pose.position.y = static_cast<double>(detection.bbox.center.position.y);
@@ -620,13 +623,17 @@ protected:
         marker->action = Marker::ADD;
         marker->header = detection.header;
 
+        
+        
         marker->text            = class_prediction;
         marker->scale.z         = 0.5;    // Set the size of the text
         marker->id              = idx;
         marker->ns              = "class_pred";
-        marker->color.r         = 1.0f;
-        marker->color.g         = 1.0f;
-        marker->color.b         = 1.0f;
+        
+        QColor color = getColor("class_score_id");
+        marker->color.r         = color.red() / 255.0f;
+        marker->color.g         = color.green() / 255.0f;
+        marker->color.b         = color.blue() / 255.0f;
         marker->color.a         = alpha;
         marker->pose.position.x = static_cast<double>(detection.bbox.center.position.x);
         marker->pose.position.y = static_cast<double>(detection.bbox.center.position.y);
