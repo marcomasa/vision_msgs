@@ -3,8 +3,11 @@
 ## Main Changes
 
 This package is a fork from the original [vision_msgs](https://github.com/ros-perception/vision_msgs) package.
-The main thing that was added are custom messag and display types for 
-more detailed Detection3D messages (see also [this discussion](https://github.com/ros-perception/vision_msgs/issues/105)):
+The main thing that was added are custom message and display types for 
+more detailed Detection3D messages (see also [this discussion](https://github.com/ros-perception/vision_msgs/issues/105)).
+
+With the aim of solving a common data association problem in 3-DoF and 6-DoF object detection and tracking,
+we propose two message types that combine the raw PCL segment of an object and traditional 3D bounding box detections into one data format.
 
 - Detection3DWithPcl.msg
 - Detection3DWithPclArray.msg
